@@ -1,6 +1,11 @@
 ﻿using Cysharp.Threading.Tasks;
+using SamePictures.Extensions;
+using SamePictures.Repositories;
 using SiphoinUnityHelpers;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -9,7 +14,8 @@ namespace SamePictures.Services
 {
     public class LevelService : IService
     {
-        private readonly int _maxCountCards = 110;
+        private bool _isInitialized;
+        private int _maxCountCards;
         private readonly int _maxCountSelectingCards = 2;
         private IPicture[] _selectedPictures;
 
@@ -24,16 +30,28 @@ namespace SamePictures.Services
 
         private GridLayoutGroup _grid;
 
+        private PictureRepository _pictureRepository;
+
+        private Queue<Sprite> _spritesVariants;
+
         private IPicture[] _pictures;
 
-        public void Initialize()
+        public async void Initialize()
         {
+            _pictureRepository = Startup.GetRepository<PictureRepository>();
+
+            await UniTask.WaitUntil(() => _pictureRepository.IsLoadedAllSprites);
+
+            _maxCountCards = _pictureRepository.CountSprites;
+
             _pictures = new IPicture[_maxCountCards];
             _selectedPictures = new IPicture[_maxCountSelectingCards];
         }
 
         public async UniTask InitializeCards()
         {
+            await UniTask.WaitUntil(() => _pictureRepository.IsLoadedAllSprites);
+
             var picture = await AddressablesHelperUniTask.GetPrefab<Picture>();
 
             for (int i = 0; i < _pictures.Length; i++)
@@ -90,13 +108,49 @@ namespace SamePictures.Services
 
         public void NewLevel()
         {
+            ResetCards();
+
             HideCards();
 
-            int countCards = UnityEngine.Random.Range(0, _maxCountCards + 1);
+            int countCards = UnityEngine.Random.Range(2, _maxCountCards + 1);
 
             _requireCountEquals = countCards;
 
-            ShowCards(countCards);
+            SetPicturesForCards(countCards);
+        }
+
+        private void SetPicturesForCards(int countCards)
+        {
+            _spritesVariants = new Queue<Sprite>(_pictureRepository.Sprites.Shuffle());
+
+            
+
+            for (int i = 0; i < countCards / 2; i++)
+            {
+                System.Random random = new System.Random();
+
+                var sprite = _spritesVariants.Dequeue();
+
+                if (sprite == null)
+                {
+                    Debug.Log("sprite null");
+                }
+
+                var first = _pictures.Where(s => s.IsEmpty).OrderBy(s => random.Next()).First();
+
+                var second = _pictures.Where(s => s.IsEmpty).OrderBy(s => random.Next()).First();
+
+                IPicture[] pictures = new IPicture[]
+                {
+                    first, second,
+                };
+
+                for (int j = 0; j < pictures.Length; j++)
+                {
+                    pictures[j].Show();
+                    pictures[j].SetSprite(sprite);
+                }
+            }
         }
 
         private void HideCards ()
@@ -107,11 +161,11 @@ namespace SamePictures.Services
             }
         }
 
-        private void ShowCards (int count)
+        private void ResetCards()
         {
-            for (int i = 0; i < count; i++)
+            foreach (var picture in _pictures)
             {
-                _pictures[i].Show();
+                picture.ResetSprite();
             }
         }
 

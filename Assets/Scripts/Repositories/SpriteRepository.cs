@@ -1,11 +1,8 @@
 ﻿using Cysharp.Threading.Tasks;
 using SamePictures.Extensions;
 using SiphoinUnityHelpers;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SamePictures.Repositories
@@ -15,6 +12,12 @@ namespace SamePictures.Repositories
         private string _key;
 
         private Sprite[] _sprites;
+
+        public int CountSprites => _sprites.Length;
+
+        public bool IsLoadedAllSprites => _sprites != null;
+
+        public IEnumerable<Sprite> Sprites => _sprites;
 
         public SpriteRepository(string key)
         {
