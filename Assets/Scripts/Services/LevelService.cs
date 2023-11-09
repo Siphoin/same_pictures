@@ -78,8 +78,9 @@ namespace SamePictures.Services
                 _selectedPictures[_selectedCountCards - 1] = picture;
             }
 
-            else if (_selectedCountCards == _maxCountCards)
+            else if (_selectedCountCards == _maxCountSelectingCards)
             {
+                
                 IPicture firstPicture = _selectedPictures[0];
 
                 IPicture lastPicture = _selectedPictures[_selectedPictures.Length - 1];
@@ -90,8 +91,8 @@ namespace SamePictures.Services
                 {
                     firstPicture.Deactivate();
                     lastPicture.Deactivate();
-                }
 
+                }
                 _selectedCountCards = 0;
             }
         }
@@ -123,13 +124,13 @@ namespace SamePictures.Services
         {
             _spritesVariants = new Queue<Sprite>(_pictureRepository.Sprites.Shuffle());
 
-            
+            System.Random random = new System.Random();
 
             for (int i = 0; i < countCards / 2; i++)
             {
-                System.Random random = new System.Random();
 
-                var sprite = _spritesVariants.Dequeue();
+
+                var sprite = _pictureRepository.Sprites.First();
 
                 if (sprite == null)
                 {

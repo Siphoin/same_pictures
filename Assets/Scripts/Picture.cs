@@ -39,9 +39,9 @@ namespace SamePictures
 
         private void Select()
         {
-            OnSelect?.Invoke(this, new PictureEventArgs());
-
             _pictogram.sprite = _setedSprite;
+
+            OnSelect?.Invoke(this, new PictureEventArgs());
         }
 
         public override bool Equals(object other)
