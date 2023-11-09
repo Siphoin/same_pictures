@@ -8,11 +8,11 @@ PlayerSettings:
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
-  defaultScreenOrientation: 4
+  defaultScreenOrientation: 2
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: DefaultCompany
+  companyName: Siphoin
   productName: Same Pictures
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
@@ -666,7 +666,9 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
   webGLPowerPreference: 2
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    Server: Assets/Sprites/Pictures/p_1.png
+    Standalone: Assets/Sprites/Pictures/p_1.png
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}

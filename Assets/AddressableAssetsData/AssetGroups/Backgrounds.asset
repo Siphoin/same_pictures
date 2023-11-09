@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Backgrounds
+  m_EditorClassIdentifier: 
+  m_GroupName: Backgrounds
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 42de891c0ea93d54aa5384aca2425f54
+  m_SerializeEntries:
+  - m_GUID: 79a6579b7ce796041a9b34eaec3dd8f3
+    m_Address: b_1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Background
+  - m_GUID: f3b48955912222d4380a1e521b3f822b
+    m_Address: b_2
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Background
+  - m_GUID: 4cc1ff11160213243942a56f1ace3f52
+    m_Address: b_3
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Background
+  - m_GUID: 196cefa1a6c49ae46b35babbf4f8dadd
+    m_Address: b_4
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Background
+  - m_GUID: 469f6d6a2697d09498416027bee60155
+    m_Address: b_5
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Background
+  - m_GUID: d2e378bdbe4419e49989da5c3d72e761
+    m_Address: b_6
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Background
+  - m_GUID: 4b538207323fc2a419fcff983ba7c726
+    m_Address: b_8
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Background
+  - m_GUID: a162e8e59f6422c4fbce694ed7c7cb3b
+    m_Address: b_9
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Background
+  - m_GUID: 9450210436d349b48be4768b5c2c1e29
+    m_Address: b_10
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Background
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 8fa16bec6ae751844b8fdfaeab848365, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 763817edf722aa943a3ad79f5d2c2f73, type: 2}
+    - {fileID: 11400000, guid: b02f7b38c5fc0864892f2722477fceab, type: 2}
