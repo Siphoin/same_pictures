@@ -16,6 +16,7 @@ namespace SamePictures.Services
     {
         private bool _isInitialized;
         private int _maxCountCards;
+        private int _level = 1;
         private readonly int _maxCountSelectingCards = 2;
         private IPicture[] _selectedPictures;
 
@@ -23,7 +24,7 @@ namespace SamePictures.Services
         private int _score;
         private int _requireCountEquals;
         private int _selectedCountCards;
-
+        public event Action OnNew;
         public event Action OnEnd;
         public event Action<int> OnSuccessSelect;
         public event Action<int> OnFailureSelect;
@@ -73,12 +74,9 @@ namespace SamePictures.Services
 
             _selectedCountCards++;
 
-            if (_selectedCountCards < _maxCountSelectingCards)
-            {
-                _selectedPictures[_selectedCountCards - 1] = picture;
-            }
+            _selectedPictures[_selectedCountCards - 1] = picture;
 
-            else if (_selectedCountCards == _maxCountSelectingCards)
+            if (_selectedCountCards == _maxCountSelectingCards)
             {
                 
                 IPicture firstPicture = _selectedPictures[0];
@@ -87,13 +85,26 @@ namespace SamePictures.Services
 
                 bool equals = CompareCards(firstPicture, lastPicture);
 
-                if (equals)
-                {
-                    firstPicture.Deactivate();
-                    lastPicture.Deactivate();
+                Color color = equals ? Color.green : Color.red;
+                firstPicture.Deactivate();
+                lastPicture.Deactivate();
+                firstPicture.SetColor(color);
+                lastPicture.SetColor(color);
 
+                if (!equals)
+                {
+                    ResetCards(firstPicture, lastPicture).Forget();
+                }
+
+                else
+                {
+                    _requireCountEquals -= _maxCountSelectingCards;
                 }
                 _selectedCountCards = 0;
+            }
+            if (_requireCountEquals == 0)
+            {
+                NextLevel().Forget();
             }
         }
 
@@ -113,45 +124,43 @@ namespace SamePictures.Services
 
             HideCards();
 
-            int countCards = UnityEngine.Random.Range(2, _maxCountCards + 1);
+            int countCards = UnityEngine.Random.Range(_maxCountSelectingCards, _level * 2 + 1);
+
+            while (countCards % _maxCountSelectingCards != 0)
+            {
+                countCards++;
+            }
 
             _requireCountEquals = countCards;
 
             SetPicturesForCards(countCards);
+
+            OnNew?.Invoke();
         }
 
         private void SetPicturesForCards(int countCards)
         {
             _spritesVariants = new Queue<Sprite>(_pictureRepository.Sprites.Shuffle());
 
-            System.Random random = new System.Random();
+            Queue<IPicture> pictures = new Queue<IPicture>(_pictures.Shuffle());
 
-            for (int i = 0; i < countCards / 2; i++)
+            for (int i = 0; i < countCards / _maxCountSelectingCards; i++)
             {
-
-
-                var sprite = _pictureRepository.Sprites.First();
-
-                if (sprite == null)
+                var sprite = _spritesVariants.Dequeue();
+                IPicture[] selectedPictures = new IPicture[]
                 {
-                    Debug.Log("sprite null");
-                }
-
-                var first = _pictures.Where(s => s.IsEmpty).OrderBy(s => random.Next()).First();
-
-                var second = _pictures.Where(s => s.IsEmpty).OrderBy(s => random.Next()).First();
-
-                IPicture[] pictures = new IPicture[]
-                {
-                    first, second,
+                    pictures.Dequeue(),
+                    pictures.Dequeue()
                 };
-
-                for (int j = 0; j < pictures.Length; j++)
+                for (int j = 0; j < selectedPictures.Length; j++)
                 {
-                    pictures[j].Show();
-                    pictures[j].SetSprite(sprite);
+                    var picture = selectedPictures[j];
+
+                    picture.Show();
+                    picture.SetSprite(sprite);
                 }
             }
+
         }
 
         private void HideCards ()
@@ -166,13 +175,16 @@ namespace SamePictures.Services
         {
             foreach (var picture in _pictures)
             {
+                picture.ResetSpriteToDefault();
                 picture.ResetSprite();
+                picture.ResetColor();
+                picture.Activate();
             }
         }
 
-        private bool CompareCards (IPicture pictureA, IPicture pictureB)
+        private bool CompareCards (IPicture a, IPicture b)
         {
-            bool equals = pictureA.Equals(pictureB);
+            bool equals = a.Equals(b);
 
             if (equals)
             {
@@ -188,6 +200,31 @@ namespace SamePictures.Services
                 OnFailureSelect?.Invoke(_errorsCount);
             }
             return equals;
+        }
+
+        private async UniTask ResetCards (params IPicture[] pictures)
+        {
+             TimeSpan timeSpan = TimeSpan.FromSeconds(0.5f);
+
+            await UniTask.Delay(timeSpan);
+
+            foreach (var picture in pictures)
+            {
+                picture.ResetColor().ToUniTask().Forget();
+                picture.ResetSpriteToDefault();
+                picture.Activate();
+            }
+        }
+
+        private async UniTask NextLevel()
+        {
+            TimeSpan timeSpan = TimeSpan.FromSeconds(2);
+
+            await UniTask.Delay(timeSpan);
+
+            _level++;
+
+            NewLevel();
         }
     }
 }

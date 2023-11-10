@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System;
+using DG.Tweening;
 
 namespace SamePictures
 {
@@ -8,15 +9,20 @@ namespace SamePictures
     [RequireComponent(typeof(Button))]
     public class Picture : MonoBehaviour, IPicture
     {
+        private float _animationDuration = 0.5f;
+
+        private Color _defaultColor;
+        private Color _clearColor;
         public event EventHandler OnSelect;
 
+        private Image _shirt;
         [SerializeField] private Image _pictogram;
 
         private Button _button;
         private Sprite _defaultSprite;
         private Sprite _setedSprite;
 
-        public Sprite Sprite => _pictogram.sprite;
+        public Sprite Sprite => _setedSprite;
 
         public bool IsEmpty => _setedSprite is null;
 
@@ -32,16 +38,54 @@ namespace SamePictures
                 throw new NullReferenceException($"{nameof(Picture)} must have component Button");
             }
 
+            if (!TryGetComponent(out _shirt))
+            {
+                throw new NullReferenceException($"{nameof(Picture)} must have component Imagr");
+            }
+
+            _defaultColor = _shirt.color;
+
+            _clearColor = _pictogram.color;
+
+            _clearColor.a = 0;
+
             _defaultSprite = _pictogram.sprite;
 
             _button.onClick.AddListener(Select);
+        }
+
+        private void FixedUpdate()
+        {
+            transform.localRotation = Quaternion.identity;
         }
 
         private void Select()
         {
             _pictogram.sprite = _setedSprite;
 
+            _pictogram.color = _clearColor;
+
+            FlipOver();
+
+            Sequence sequence = DOTween.Sequence();
+            sequence.Join(_pictogram.transform.DOPunchScale(Vector3.one / 2, _animationDuration));
+            sequence.Join(ResetColor());
+            sequence.Play();
+
             OnSelect?.Invoke(this, new PictureEventArgs());
+        }
+
+        private Tween Scale (float scale)
+        {
+            return transform.DOScale(scale, _animationDuration + (transform.GetSiblingIndex() / 10));
+        }
+
+        private void FlipOver()
+        {
+            Sequence sequence = DOTween.Sequence();
+            sequence.Join(transform.DORotate(new Vector3(0, 180, 0), _animationDuration, RotateMode.Fast));
+            sequence.Append(transform.DORotate(Vector3.zero, _animationDuration, RotateMode.Fast));
+            sequence.Play();
         }
 
         public override bool Equals(object other)
@@ -50,10 +94,10 @@ namespace SamePictures
             {
                 var equalsPicture = other as IPicture;
 
-                return equalsPicture.Sprite.Equals(_pictogram.sprite);
+                return equalsPicture.Sprite.Equals(Sprite);
             }
 
-            return false;
+            return base.Equals(other);
         }
 
         public override int GetHashCode()
@@ -64,11 +108,13 @@ namespace SamePictures
         public void Show()
         {
             gameObject.SetActive(true);
+            transform.localScale = Vector3.zero;
+            Scale(1);
         }
 
         public void Hide()
         {
-            gameObject.SetActive(false);
+            gameObject?.SetActive(false);
         }
 
         public void Deactivate()
@@ -76,16 +122,36 @@ namespace SamePictures
             _button.interactable = false;
         }
 
-        public void ResetSprite()
+
+        public void Activate()
+        {
+            _button.interactable = true;
+        }
+        public void ResetSpriteToDefault()
         {
             _pictogram.sprite = _defaultSprite;
+        }
 
+        public void ResetSprite()
+        {
             _setedSprite = null;
+
+            ResetSpriteToDefault();
+        }
+
+        public Tween ResetColor()
+        {
+            return SetColor(_defaultColor);
         }
 
         public void SetSprite(Sprite sprite)
         {
             _setedSprite = sprite;
+        }
+
+        public Tween SetColor(Color color)
+        {
+            return _pictogram.DOColor(color, _animationDuration);
         }
     }
 }

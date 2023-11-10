@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DG.Tweening;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -15,8 +16,15 @@ namespace SamePictures
 
         void Hide();
 
+        bool Equals(object other);
+
         void Deactivate();
         void ResetSprite();
         void SetSprite(Sprite sprite);
+
+        Tween ResetColor();
+        Tween SetColor(Color color);
+        void Activate();
+        void ResetSpriteToDefault();
     }
 }
