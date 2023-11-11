@@ -74,6 +74,8 @@ namespace SamePictures
             sequence.Join(ResetColor());
             sequence.Play();
 
+            Deactivate();
+
             OnSelect?.Invoke(this, new PictureEventArgs());
         }
 
