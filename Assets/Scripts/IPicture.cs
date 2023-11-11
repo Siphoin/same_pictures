@@ -15,16 +15,15 @@ namespace SamePictures
         void Show();
 
         void Hide();
-
-        bool Equals(object other);
-
+        void Activate();
+        void ResetSpriteToDefault();
         void Deactivate();
         void ResetSprite();
         void SetSprite(Sprite sprite);
 
+        bool Equals(object other);
+
         Tween ResetColor();
         Tween SetColor(Color color);
-        void Activate();
-        void ResetSpriteToDefault();
     }
 }

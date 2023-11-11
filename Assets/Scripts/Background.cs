@@ -7,7 +7,7 @@ namespace SamePictures
 {
     public class Background : MonoBehaviour
     {
-        private const int DEPTH = 10;
+        private const int DEPTH = 12;
 
         private SpriteRenderer _spriteRenderer;
         private BackgroundRepository _repository;

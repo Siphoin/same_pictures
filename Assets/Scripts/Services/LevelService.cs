@@ -3,9 +3,7 @@ using SamePictures.Extensions;
 using SamePictures.Repositories;
 using SiphoinUnityHelpers;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -14,16 +12,16 @@ namespace SamePictures.Services
 {
     public class LevelService : IService
     {
-        private bool _isInitialized;
         private int _maxCountCards;
         private int _level = 1;
         private readonly int _maxCountSelectingCards = 2;
-        private IPicture[] _selectedPictures;
 
         private int _errorsCount;
         private int _score;
         private int _requireCountEquals;
         private int _selectedCountCards;
+        private readonly float _timeOutResetCards = 0.5f;
+        private readonly float _timeOutNewLevel = 2;
         public event Action OnNew;
         public event Action OnEnd;
         public event Action<int> OnSuccessSelect;
@@ -36,6 +34,13 @@ namespace SamePictures.Services
         private Queue<Sprite> _spritesVariants;
 
         private IPicture[] _pictures;
+        private IPicture[] _selectedPictures;
+
+        private readonly Color[] _colorsSelecting = new Color[]
+        {
+            new Color32(245, 174, 174, 255),
+            new Color32(174, 245, 189, 255)
+        };
 
         public async void Initialize()
         {
@@ -85,7 +90,7 @@ namespace SamePictures.Services
 
                 bool equals = CompareCards(firstPicture, lastPicture);
 
-                Color color = equals ? Color.green : Color.red;
+                Color color = _colorsSelecting[Convert.ToInt32(equals)];
                 firstPicture.Deactivate();
                 lastPicture.Deactivate();
                 firstPicture.SetColor(color);
@@ -125,6 +130,8 @@ namespace SamePictures.Services
             HideCards();
 
             int countCards = UnityEngine.Random.Range(_maxCountSelectingCards, _level * 2 + 1);
+
+            countCards = Mathf.Clamp(countCards, _maxCountSelectingCards * 2, _maxCountCards);
 
             while (countCards % _maxCountSelectingCards != 0)
             {
@@ -204,7 +211,7 @@ namespace SamePictures.Services
 
         private async UniTask ResetCards (params IPicture[] pictures)
         {
-             TimeSpan timeSpan = TimeSpan.FromSeconds(0.5f);
+             TimeSpan timeSpan = TimeSpan.FromSeconds(_timeOutResetCards);
 
             await UniTask.Delay(timeSpan);
 
@@ -218,7 +225,7 @@ namespace SamePictures.Services
 
         private async UniTask NextLevel()
         {
-            TimeSpan timeSpan = TimeSpan.FromSeconds(2);
+            TimeSpan timeSpan = TimeSpan.FromSeconds(_timeOutNewLevel);
 
             await UniTask.Delay(timeSpan);
 

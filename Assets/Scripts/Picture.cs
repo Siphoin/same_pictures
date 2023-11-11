@@ -10,9 +10,11 @@ namespace SamePictures
     public class Picture : MonoBehaviour, IPicture
     {
         private float _animationDuration = 0.5f;
+        [SerializeField, Min(0)] private float _speedScaling = 10;
 
         private Color _defaultColor;
         private Color _clearColor;
+
         public event EventHandler OnSelect;
 
         private Image _shirt;
@@ -68,7 +70,7 @@ namespace SamePictures
             FlipOver();
 
             Sequence sequence = DOTween.Sequence();
-            sequence.Join(_pictogram.transform.DOPunchScale(Vector3.one / 2, _animationDuration));
+            sequence.Join(_pictogram.transform.DOPunchScale(transform.localScale / 2, _animationDuration));
             sequence.Join(ResetColor());
             sequence.Play();
 
@@ -77,13 +79,15 @@ namespace SamePictures
 
         private Tween Scale (float scale)
         {
-            return transform.DOScale(scale, _animationDuration + (transform.GetSiblingIndex() / 10));
+            return transform.DOScale(scale, _animationDuration + (transform.GetSiblingIndex() / _speedScaling));
         }
 
         private void FlipOver()
         {
+            Vector3 flipVector = new Vector3(0, 180, 0);
+
             Sequence sequence = DOTween.Sequence();
-            sequence.Join(transform.DORotate(new Vector3(0, 180, 0), _animationDuration, RotateMode.Fast));
+            sequence.Join(transform.DORotate(flipVector, _animationDuration, RotateMode.Fast));
             sequence.Append(transform.DORotate(Vector3.zero, _animationDuration, RotateMode.Fast));
             sequence.Play();
         }
