@@ -16,8 +16,6 @@ namespace SamePictures
         private Color _clearColor;
 
         public event EventHandler OnSelect;
-
-        private Image _shirt;
         [SerializeField] private Image _pictogram;
 
         private Button _button;
@@ -40,12 +38,7 @@ namespace SamePictures
                 throw new NullReferenceException($"{nameof(Picture)} must have component Button");
             }
 
-            if (!TryGetComponent(out _shirt))
-            {
-                throw new NullReferenceException($"{nameof(Picture)} must have component Imagr");
-            }
-
-            _defaultColor = _shirt.color;
+            _defaultColor = _pictogram.color;
 
             _clearColor = _pictogram.color;
 

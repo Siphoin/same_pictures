@@ -58,7 +58,7 @@ namespace SamePictures.Services
         {
             await UniTask.WaitUntil(() => _pictureRepository.IsLoadedAllSprites);
 
-            var picture = await AddressablesHelperUniTask.GetPrefab<Picture>();
+            var picture = await AddressablesHelperUniTask.GetPrefab<Picture>(false);
 
             for (int i = 0; i < _pictures.Length; i++)
             {
